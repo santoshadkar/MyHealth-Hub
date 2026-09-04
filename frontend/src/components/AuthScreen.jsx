@@ -23,7 +23,8 @@ export default function AuthScreen({ onSignIn, onRegister, onDemoLogin }) {
     setRegSuccessMsg('');
     if (isRegister) {
       if (!name || !email || !password) return;
-      const res = await onRegister({ name, email, password, role, age, specialty, contact });
+      const safeAge = parseInt(age) || 35;
+      const res = await onRegister({ name, email, password, role, age: safeAge, specialty, contact });
       if (res.error) {
         setErrorMsg(res.error);
       } else {

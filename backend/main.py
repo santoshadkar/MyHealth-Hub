@@ -24,7 +24,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -241,7 +241,7 @@ class RegisterReq(BaseModel):
     email: str
     password: str
     role: str
-    age: Optional[int] = 35
+    age: Optional[Any] = 35
     specialty: Optional[str] = "General Physician"
     contact: Optional[str] = "+91 98000 11111"
 

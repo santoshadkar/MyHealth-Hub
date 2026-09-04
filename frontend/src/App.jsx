@@ -98,14 +98,14 @@ export default function App() {
         body: JSON.stringify(regData)
       });
       if (!res.ok) {
-        const err = await res.json();
-        return { error: err.detail || 'Registration failed' };
+        const err = await res.json().catch(() => ({ detail: 'Registration failed' }));
+        return { error: typeof err.detail === 'string' ? err.detail : 'Registration validation failed' };
       }
       const data = await res.json();
       setUser(data.user);
       return { success: true };
     } catch (err) {
-      return { error: 'Server connection error' };
+      return { error: `Server connection error: ${err.message || 'Unable to connect'}` };
     }
   };
 
