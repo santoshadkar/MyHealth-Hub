@@ -3,6 +3,8 @@ import { Activity, Heart, Droplets, Calendar, Pill, Plus, Upload, Send, Bot, Use
 import FitbitWidget from './FitbitWidget';
 import HealthAnalyticsChart from './HealthAnalyticsChart';
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+
 export default function PatientDashboard({ patient, documents, appointments, onAddVitals, onAddDocument, onSendMessage, chatState, isChatLoading, onRequestRefill }) {
   const [fastingSugar, setFastingSugar] = useState(142);
   const [ppSugar, setPpSugar] = useState(198);
@@ -23,17 +25,17 @@ export default function PatientDashboard({ patient, documents, appointments, onA
   const [fitbitData, setFitbitData] = useState(patient.fitbit_telemetry || null);
 
   useEffect(() => {
-    fetch(`${'http://localhost:8000/api'}/nearby-facilities`)
+    fetch(`${API_BASE}/nearby-facilities`)
       .then(res => res.json())
       .then(data => setNearbyFacilities(data.facilities || []))
       .catch(err => console.log(err));
 
-    fetch(`${'http://localhost:8000/api'}/doctor-profile`)
+    fetch(`${API_BASE}/doctor-profile`)
       .then(res => res.json())
       .then(data => setDoctorProfile(data.doctor))
       .catch(err => console.log(err));
 
-    fetch(`${'http://localhost:8000/api'}/patient/${patient.id || 'P-1001'}/analytics`)
+    fetch(`${API_BASE}/patient/${patient.id || 'P-1001'}/analytics`)
       .then(res => res.json())
       .then(data => {
         setAnalyticsData(data);
@@ -44,12 +46,12 @@ export default function PatientDashboard({ patient, documents, appointments, onA
 
   const handleFitbitSync = async () => {
     try {
-      const res = await fetch(`${'http://localhost:8000/api'}/fitbit/sync/${patient.id || 'P-1001'}`, { method: 'POST' });
+      const res = await fetch(`${API_BASE}/fitbit/sync/${patient.id || 'P-1001'}`, { method: 'POST' });
       const json = await res.json();
       if (json.fitbit_telemetry) {
         setFitbitData(json.fitbit_telemetry);
         // Refresh analytics
-        const aRes = await fetch(`${'http://localhost:8000/api'}/patient/${patient.id || 'P-1001'}/analytics`);
+        const aRes = await fetch(`${API_BASE}/patient/${patient.id || 'P-1001'}/analytics`);
         const aJson = await aRes.json();
         setAnalyticsData(aJson);
       }

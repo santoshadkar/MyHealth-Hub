@@ -3,6 +3,8 @@ import { Stethoscope, User, ShieldAlert, Check, X, Sparkles, Activity, FileText,
 import FitbitWidget from './FitbitWidget';
 import HealthAnalyticsChart from './HealthAnalyticsChart';
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+
 export default function DoctorDashboard({ doctorUser, hitlApprovals = [], onProcessApproval, onTriggerLabWebhook }) {
   const [todayQueue, setTodayQueue] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -14,7 +16,7 @@ export default function DoctorDashboard({ doctorUser, hitlApprovals = [], onProc
   const docSpecialty = doctorUser?.specialty || 'General Physician';
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/doctor/today-queue')
+    fetch(`${API_BASE}/doctor/today-queue`)
       .then(res => res.json())
       .then(data => {
         setTodayQueue(data.queue || []);
@@ -26,12 +28,12 @@ export default function DoctorDashboard({ doctorUser, hitlApprovals = [], onProc
   }, []);
 
   const handleSelectPatient = (patientId) => {
-    fetch(`http://localhost:8000/api/patient/${patientId}`)
+    fetch(`${API_BASE}/patient/${patientId}`)
       .then(res => res.json())
       .then(data => setSelectedPatient(data))
       .catch(err => console.log(err));
 
-    fetch(`http://localhost:8000/api/patient/${patientId}/analytics`)
+    fetch(`${API_BASE}/patient/${patientId}/analytics`)
       .then(res => res.json())
       .then(data => setPatientAnalytics(data))
       .catch(err => console.log(err));
