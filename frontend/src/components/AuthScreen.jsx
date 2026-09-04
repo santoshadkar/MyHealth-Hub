@@ -26,24 +26,30 @@ export default function AuthScreen({ onSignIn, onRegister, onDemoLogin }) {
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotMsg, setForgotMsg] = useState('');
   const [regSuccessMsg, setRegSuccessMsg] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
     setRegSuccessMsg('');
-    if (isRegister) {
-      if (!name || !email || !password) return;
-      const safeAge = parseInt(age) || 35;
-      const res = await onRegister({ name, email, password, role, age: safeAge, specialty, contact });
-      if (res.error) {
-        setErrorMsg(res.error);
+    setSubmitting(true);
+    try {
+      if (isRegister) {
+        if (!name || !email || !password) return;
+        const safeAge = parseInt(age) || 35;
+        const res = await onRegister({ name, email, password, role, age: safeAge, specialty, contact });
+        if (res && res.error) {
+          setErrorMsg(res.error);
+        } else {
+          setRegSuccessMsg(`📩 Registration successful! A welcome confirmation email has been dispatched to ${email}.`);
+        }
       } else {
-        setRegSuccessMsg(`📩 Registration successful! A welcome confirmation email has been dispatched to ${email}.`);
+        if (!email || !password) return;
+        const res = await onSignIn({ email, password });
+        if (res && res.error) setErrorMsg(res.error);
       }
-    } else {
-      if (!email || !password) return;
-      const res = await onSignIn({ email, password });
-      if (res.error) setErrorMsg(res.error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -227,10 +233,13 @@ export default function AuthScreen({ onSignIn, onRegister, onDemoLogin }) {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-bold text-xs shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
+            disabled={submitting}
+            className={`w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-bold text-xs shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2 ${
+              submitting ? 'opacity-50 cursor-wait' : ''
+            }`}
           >
-            <span>{isRegister ? 'Complete Registration' : 'Sign In to Portal'}</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>{submitting ? 'Connecting to Server...' : (isRegister ? 'Complete Registration' : 'Sign In to Portal')}</span>
+            <ArrowRight className={`w-4 h-4 ${submitting ? 'animate-pulse' : ''}`} />
           </button>
         </form>
       </div>

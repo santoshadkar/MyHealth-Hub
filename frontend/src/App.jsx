@@ -79,42 +79,54 @@ export default function App() {
     }
   };
 
+const fetchWithRetry = async (url, options = {}, retries = 3) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(url, options);
+      return res;
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  }
+};
+
   const handleSignIn = async ({ email, password }) => {
     try {
-      const res = await fetch(`${API_BASE}/auth/signin`, {
+      const res = await fetchWithRetry(`${API_BASE}/auth/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
       if (!res.ok) {
-        const err = await res.json();
-        return { error: err.detail || 'Sign in failed' };
+        const err = await res.json().catch(() => ({ detail: 'Sign in failed' }));
+        return { error: typeof err.detail === 'string' ? err.detail : 'Invalid email or password' };
       }
       const data = await res.json();
       setUser(data.user);
       return { success: true };
     } catch (err) {
-      return { error: 'Server connection error' };
+      return { error: 'Server is connecting/waking up. Please try again in 5 seconds.' };
     }
   };
 
   const handleRegister = async (regData) => {
     try {
-      const res = await fetch(`${API_BASE}/auth/register`, {
+      const res = await fetchWithRetry(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(regData)
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ detail: 'Registration failed' }));
-        return { error: typeof err.detail === 'string' ? err.detail : 'Registration validation failed' };
+        return { error: typeof err.detail === 'string' ? err.detail : 'Registration failed' };
       }
       const data = await res.json();
       setUser(data.user);
       if (data.patient) setPatient(data.patient);
       return { success: true };
     } catch (err) {
-      return { error: `Server connection error: ${err.message || 'Unable to connect'}` };
+      return { error: 'Server is connecting/waking up. Please try again in 5 seconds.' };
     }
   };
 
