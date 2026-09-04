@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { HeartPulse, UserCheck, Stethoscope, Lock, Mail, User, ArrowRight } from 'lucide-react';
 
+const getApiBase = () => {
+  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+  if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname !== 'localhost')) {
+    return 'https://myhealth-hub-vyvc.onrender.com/api';
+  }
+  return 'http://localhost:8000/api';
+};
+const API_BASE = getApiBase();
+
 export default function AuthScreen({ onSignIn, onRegister, onDemoLogin }) {
   const [isRegister, setIsRegister] = useState(false);
   const [role, setRole] = useState('patient');
@@ -41,7 +50,7 @@ export default function AuthScreen({ onSignIn, onRegister, onDemoLogin }) {
     e.preventDefault();
     if (!forgotEmail) return;
     try {
-      const res = await fetch('http://localhost:8000/api/auth/forgot-password', {
+      const res = await fetch(`${API_BASE}/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: forgotEmail })
