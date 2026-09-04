@@ -110,6 +110,7 @@ export default function App() {
       }
       const data = await res.json();
       setUser(data.user);
+      if (data.patient) setPatient(data.patient);
       return { success: true };
     } catch (err) {
       return { error: `Server connection error: ${err.message || 'Unable to connect'}` };

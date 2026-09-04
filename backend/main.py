@@ -405,7 +405,7 @@ def register(req: RegisterReq):
                 status="scheduled"
             )
         )
-        return {"status": "success", "user": user_data}
+        return {"status": "success", "user": user_data, "patient": patient_database[patient_id]}
 
 @app.get("/api/patient/{patient_id}")
 def get_patient(patient_id: str):

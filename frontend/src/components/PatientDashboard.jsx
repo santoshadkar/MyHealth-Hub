@@ -13,6 +13,18 @@ const getApiBase = () => {
 const API_BASE = getApiBase();
 
 export default function PatientDashboard({ patient, documents, appointments, onAddVitals, onAddDocument, onSendMessage, chatState, isChatLoading, onRequestRefill }) {
+  const safePatient = patient || {
+    id: 'P-1001',
+    name: 'Registered Patient',
+    age: 35,
+    gender: 'Patient',
+    address: 'Indiranagar, Bengaluru, Karnataka 560038',
+    contact: '+91 98450 11223',
+    vitals_history: [{ fasting_sugar: 95, pp_sugar: 130, systolic_bp: 120, diastolic_bp: 80, spo2: 99, pulse_rate: 72 }],
+    medical_history: ['Registered Patient Baseline Profile'],
+    allergies: ['None Reported']
+  };
+
   const [fastingSugar, setFastingSugar] = useState(142);
   const [ppSugar, setPpSugar] = useState(198);
   const [systolicBp, setSystolicBp] = useState(130);
@@ -29,7 +41,7 @@ export default function PatientDashboard({ patient, documents, appointments, onA
   const [doctorProfile, setDoctorProfile] = useState(null);
   const [chatInput, setChatInput] = useState('');
   const [analyticsData, setAnalyticsData] = useState(null);
-  const [fitbitData, setFitbitData] = useState(patient.fitbit_telemetry || null);
+  const [fitbitData, setFitbitData] = useState(safePatient.fitbit_telemetry || null);
 
   useEffect(() => {
     fetch(`${API_BASE}/nearby-facilities`)
@@ -42,14 +54,15 @@ export default function PatientDashboard({ patient, documents, appointments, onA
       .then(data => setDoctorProfile(data.doctor))
       .catch(err => console.log(err));
 
-    fetch(`${API_BASE}/patient/${patient.id || 'P-1001'}/analytics`)
+    const pid = safePatient.id || safePatient.patient_id || 'P-1001';
+    fetch(`${API_BASE}/patient/${pid}/analytics`)
       .then(res => res.json())
       .then(data => {
         setAnalyticsData(data);
         if (data.fitbit_telemetry) setFitbitData(data.fitbit_telemetry);
       })
       .catch(err => console.log(err));
-  }, [patient.id]);
+  }, [safePatient.id, safePatient.patient_id]);
 
   const handleFitbitSync = async () => {
     try {
