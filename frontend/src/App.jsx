@@ -4,7 +4,14 @@ import AuthScreen from './components/AuthScreen';
 import PatientDashboard from './components/PatientDashboard';
 import DoctorDashboard from './components/DoctorDashboard';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const getApiBase = () => {
+  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+  if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname !== 'localhost')) {
+    return 'https://myhealth-hub-vyvc.onrender.com/api';
+  }
+  return 'http://localhost:8000/api';
+};
+const API_BASE = getApiBase();
 
 export default function App() {
   const [user, setUser] = useState(null);
