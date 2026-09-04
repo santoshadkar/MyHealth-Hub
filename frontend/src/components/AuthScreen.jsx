@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import { HeartPulse, UserCheck, Stethoscope, Lock, Mail, User, ArrowRight } from 'lucide-react';
 
-const getApiBase = () => {
-  let url = import.meta.env.VITE_API_BASE_URL || '';
-  if (!url && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    url = 'https://myhealth-hub-vyvc.onrender.com/api';
-  }
-  if (!url) url = 'http://localhost:8000/api';
-  return url.replace(/\/+$/, '');
-};
-const API_BASE = getApiBase();
+const API_BASE = '/api';
 
 export default function AuthScreen({ onSignIn, onRegister, onDemoLogin }) {
   const [isRegister, setIsRegister] = useState(false);
