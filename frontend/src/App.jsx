@@ -98,15 +98,15 @@ const fetchWithRetry = async (url, options = {}, retries = 3) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ detail: 'Sign in failed' }));
-        return { error: typeof err.detail === 'string' ? err.detail : 'Invalid email or password' };
-      }
       const data = await res.json();
+      if (!res.ok) {
+        return { error: data.detail || 'Invalid email or password' };
+      }
       setUser(data.user);
       return { success: true };
     } catch (err) {
-      return { error: 'Server is connecting/waking up. Please try again in 5 seconds.' };
+      console.error("SignIn Exception:", err);
+      return { error: `Connection error: ${err.message || 'Unable to connect to server'}` };
     }
   };
 
@@ -117,16 +117,16 @@ const fetchWithRetry = async (url, options = {}, retries = 3) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(regData)
       });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ detail: 'Registration failed' }));
-        return { error: typeof err.detail === 'string' ? err.detail : 'Registration failed' };
-      }
       const data = await res.json();
+      if (!res.ok) {
+        return { error: data.detail || 'Registration failed' };
+      }
       setUser(data.user);
       if (data.patient) setPatient(data.patient);
       return { success: true };
     } catch (err) {
-      return { error: 'Server is connecting/waking up. Please try again in 5 seconds.' };
+      console.error("Register Exception:", err);
+      return { error: `Connection error: ${err.message || 'Unable to connect to server'}` };
     }
   };
 
