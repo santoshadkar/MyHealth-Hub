@@ -232,24 +232,6 @@ export default function AuthScreen({ onSignIn, onRegister, onDemoLogin }) {
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
-
-        <div className="relative border-t border-white/10 pt-4">
-          <div className="text-center text-[11px] text-slate-400 font-mono mb-3">Quick Demo One-Click Sign In:</div>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => onDemoLogin('patient')}
-              className="py-2 px-3 rounded-xl bg-slate-900 border border-emerald-500/30 text-emerald-300 text-xs font-semibold hover:bg-emerald-500/10 transition-all flex items-center justify-center gap-1.5"
-            >
-              <UserCheck className="w-3.5 h-3.5" /> Patient (Aarav)
-            </button>
-            <button
-              onClick={() => onDemoLogin('doctor')}
-              className="py-2 px-3 rounded-xl bg-slate-900 border border-cyan-500/30 text-cyan-300 text-xs font-semibold hover:bg-cyan-500/10 transition-all flex items-center justify-center gap-1.5"
-            >
-              <Stethoscope className="w-3.5 h-3.5" /> Doctor (Dr. Ananya)
-            </button>
-          </div>
-        </div>
       </div>
 
       {showForgotModal && (
