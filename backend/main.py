@@ -281,6 +281,7 @@ def root():
     return {"status": "online", "app": settings.PROJECT_NAME, "version": settings.VERSION}
 
 @app.post("/api/auth/signin")
+@app.post("/api/auth/signin/")
 def signin(req: SignInReq):
     user = registered_users.get(req.email.lower())
     if not user or user["password"] != req.password:
@@ -291,6 +292,7 @@ class ForgotPasswordReq(BaseModel):
     email: str
 
 @app.post("/api/auth/forgot-password")
+@app.post("/api/auth/forgot-password/")
 def forgot_password(req: ForgotPasswordReq):
     email = req.email.lower()
     # Check if user exists or simulate reset email dispatch
@@ -304,6 +306,7 @@ def forgot_password(req: ForgotPasswordReq):
     }
 
 @app.post("/api/auth/register")
+@app.post("/api/auth/register/")
 def register(req: RegisterReq):
     email = req.email.lower()
     if email in registered_users:

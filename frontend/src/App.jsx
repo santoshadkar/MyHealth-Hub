@@ -5,11 +5,12 @@ import PatientDashboard from './components/PatientDashboard';
 import DoctorDashboard from './components/DoctorDashboard';
 
 const getApiBase = () => {
-  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
-  if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname !== 'localhost')) {
-    return 'https://myhealth-hub-vyvc.onrender.com/api';
+  let url = import.meta.env.VITE_API_BASE_URL || '';
+  if (!url && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    url = 'https://myhealth-hub-vyvc.onrender.com/api';
   }
-  return 'http://localhost:8000/api';
+  if (!url) url = 'http://localhost:8000/api';
+  return url.replace(/\/+$/, '');
 };
 const API_BASE = getApiBase();
 
