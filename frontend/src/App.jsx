@@ -4,7 +4,7 @@ import AuthScreen from './components/AuthScreen';
 import PatientDashboard from './components/PatientDashboard';
 import DoctorDashboard from './components/DoctorDashboard';
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://myhealth-hub-vyvc.onrender.com/api' : 'http://localhost:8000/api')).replace(/\/+$/, '');
+const API_BASE = '/api';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -20,6 +20,7 @@ export default function App() {
   useEffect(() => {
     // Silent background ping to wake up Render free-tier server on initial page load
     fetch(`${API_BASE}/hitl/pending`).catch(() => {});
+    fetch(`https://myhealth-hub-vyvc.onrender.com/api/hitl/pending`).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -76,16 +77,28 @@ export default function App() {
     }
   };
 
-const fetchWithRetry = async (url, options = {}, retries = 5, delay = 2500) => {
+const fetchWithRetry = async (url, options = {}, retries = 6, delay = 1500) => {
+  const directRenderUrl = url.startsWith('/api')
+    ? `https://myhealth-hub-vyvc.onrender.com${url}`
+    : url;
+
   for (let i = 0; i < retries; i++) {
+    const targetUrl = (i % 2 === 0) ? url : directRenderUrl;
     try {
-      const res = await fetch(url, options);
-      return res;
+      const res = await fetch(targetUrl, options);
+      const clone = res.clone();
+      try {
+        const text = await clone.text();
+        if (text.startsWith('{') || text.startsWith('[')) {
+          return res;
+        }
+      } catch (e) {}
     } catch (err) {
-      if (i === retries - 1) throw err;
-      await new Promise(r => setTimeout(r, delay));
+      if (i === retries - 1 && targetUrl === directRenderUrl) throw err;
     }
+    await new Promise(r => setTimeout(r, delay));
   }
+  return fetch(directRenderUrl, options);
 };
 
   const handleSignIn = async ({ email, password }) => {
