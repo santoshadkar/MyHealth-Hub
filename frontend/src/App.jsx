@@ -4,7 +4,7 @@ import AuthScreen from './components/AuthScreen';
 import PatientDashboard from './components/PatientDashboard';
 import DoctorDashboard from './components/DoctorDashboard';
 
-const API_BASE = '/api';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://myhealth-hub-vyvc.onrender.com/api' : 'http://localhost:8000/api')).replace(/\/+$/, '');
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -90,7 +90,12 @@ const fetchWithRetry = async (url, options = {}, retries = 3) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      const data = await res.json();
+      let data = {};
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        return { error: 'Server response error. Please try again in a moment.' };
+      }
       if (!res.ok) {
         return { error: data.detail || 'Invalid email or password' };
       }
@@ -109,7 +114,12 @@ const fetchWithRetry = async (url, options = {}, retries = 3) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(regData)
       });
-      const data = await res.json();
+      let data = {};
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        return { error: 'Server response error. Please try again in a moment.' };
+      }
       if (!res.ok) {
         return { error: data.detail || 'Registration failed' };
       }

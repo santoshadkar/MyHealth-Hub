@@ -3,7 +3,7 @@ import { Stethoscope, User, ShieldAlert, Check, X, Sparkles, Activity, FileText,
 import FitbitWidget from './FitbitWidget';
 import HealthAnalyticsChart from './HealthAnalyticsChart';
 
-const API_BASE = '/api';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://myhealth-hub-vyvc.onrender.com/api' : 'http://localhost:8000/api')).replace(/\/+$/, '');
 
 export default function DoctorDashboard({ doctorUser, hitlApprovals = [], onProcessApproval, onTriggerLabWebhook }) {
   const [todayQueue, setTodayQueue] = useState([]);
