@@ -230,7 +230,7 @@ export default function AuthScreen({ onSignIn, onRegister, onDemoLogin }) {
               submitting ? 'opacity-50 cursor-wait' : ''
             }`}
           >
-            <span>{submitting ? 'Connecting to Server...' : (isRegister ? 'Complete Registration' : 'Sign In to Portal')}</span>
+            <span>{submitting ? 'Connecting to Server (waking backend...)' : (isRegister ? 'Complete Registration' : 'Sign In to Portal')}</span>
             <ArrowRight className={`w-4 h-4 ${submitting ? 'animate-pulse' : ''}`} />
           </button>
         </form>

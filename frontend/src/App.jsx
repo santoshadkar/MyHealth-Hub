@@ -18,6 +18,11 @@ export default function App() {
   const [isChatLoading, setIsChatLoading] = useState(false);
 
   useEffect(() => {
+    // Silent background ping to wake up Render free-tier server on initial page load
+    fetch(`${API_BASE}/hitl/pending`).catch(() => {});
+  }, []);
+
+  useEffect(() => {
     if (user && user.role === 'patient') {
       const pid = user.patient_id || 'P-1001';
       fetchPatientData(pid);
@@ -71,14 +76,14 @@ export default function App() {
     }
   };
 
-const fetchWithRetry = async (url, options = {}, retries = 3) => {
+const fetchWithRetry = async (url, options = {}, retries = 5, delay = 2500) => {
   for (let i = 0; i < retries; i++) {
     try {
       const res = await fetch(url, options);
       return res;
     } catch (err) {
       if (i === retries - 1) throw err;
-      await new Promise(r => setTimeout(r, 2000));
+      await new Promise(r => setTimeout(r, delay));
     }
   }
 };
@@ -103,7 +108,7 @@ const fetchWithRetry = async (url, options = {}, retries = 3) => {
       return { success: true };
     } catch (err) {
       console.error("SignIn Exception:", err);
-      return { error: `Connection error: ${err.message || 'Unable to connect to server'}` };
+      return { error: 'Server is starting up (Render cold start). Please wait 5 seconds and click Sign In again.' };
     }
   };
 
@@ -128,7 +133,7 @@ const fetchWithRetry = async (url, options = {}, retries = 3) => {
       return { success: true };
     } catch (err) {
       console.error("Register Exception:", err);
-      return { error: `Connection error: ${err.message || 'Unable to connect to server'}` };
+      return { error: 'Server is starting up (Render cold start). Please wait 5 seconds and click Sign In again.' };
     }
   };
 
